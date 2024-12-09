@@ -1,0 +1,35 @@
+name: Deploy staging
+on:
+  push:
+    branches:
+      - staging
+env:
+  PIPELINE_ID: ${{ github.run_id }} - ${{ github.run_attempt }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      # Remove node_modules and package-lock.json to assure we're grabbing the latest every time
+      - name: Remove node_modules
+        run: rm -rf node_modules
+
+      - name: Remove package-lock.json
+        run: rm -rf package-lock.json
+
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: managebee-staging-api
+          environment_name: dev-api
+          version_label: ${{ env.PIPELINE_ID }}
+          region: us-west-1
+          deployment_package: deploy.zip
