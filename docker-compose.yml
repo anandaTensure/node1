@@ -1,0 +1,18 @@
+version: '3'
+services:
+  dev-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "4000:4000"
+  staging-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.stage
+    environment:
+      - NODE_ENV=staging
+    ports:
+      - "4001:4001"

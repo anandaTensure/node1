@@ -3,11 +3,12 @@ on:
   push:
     branches:
       - dev
+      - staging
 env:
   PIPELINE_ID: ${{ github.run_id }} - ${{ github.run_attempt }}
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -23,13 +24,28 @@ jobs:
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
-      - name: Deploy to EB
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20'
+
+      - name: Build Docker images for dev
+        if: github.ref == 'refs/heads/dev'
+        run: docker build -t dev-image -f Dockerfile.dev .
+      - name: Build Docker images for staging
+        if: github.ref == 'refs/heads/staging'
+        run: docker build -t stage-image -f Dockerfile.stage .
+      - name: Archive deployment package
+        run: |
+          mkdir -p deployment && cp -r * deployment/
+          zip -r deployment.zip deployment/
+      - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: managebee-dev-api
-          environment_name: dev-api
-          version_label: ${{ env.PIPELINE_ID }}
-          region: us-west-1
-          deployment_package: deploy.zip
+          application_name: your-application-name
+          environment_name: your-environment-name
+          region: your-aws-region
+          version_label: v-${{ github.sha }}
+          deployment_package: deployment.zip
