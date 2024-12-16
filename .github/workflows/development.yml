@@ -24,6 +24,9 @@ jobs:
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
+      - name: list all files
+        run: ls -la
+
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
