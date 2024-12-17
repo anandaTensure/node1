@@ -49,5 +49,5 @@ jobs:
           application_name: MyNodeApp
           environment_name: dev-api
           region: ap-south-1
-          version_label: v-${{ github.sha }}
+          version_label: ${{ env.PIPELINE_ID }}
           deployment_package: deployment.zip
