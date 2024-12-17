@@ -3,6 +3,7 @@ FROM node:20-alpine AS builder
 # Set the working directory to /usr/src/app
 WORKDIR /usr/src/app
 COPY package*.json ./
+RUN npm cache clean --force
 RUN npm install
 COPY . .
 FROM node:20-alpine

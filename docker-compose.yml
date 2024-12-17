@@ -8,11 +8,3 @@ services:
       - NODE_ENV=development
     ports:
       - "4000:4000"
-  staging-app:
-    build:
-      context: .
-      dockerfile: Dockerfile.stage
-    environment:
-      - NODE_ENV=staging
-    ports:
-      - "4001:4001"
